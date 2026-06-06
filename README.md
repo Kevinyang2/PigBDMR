@@ -160,7 +160,7 @@ The prediction file should contain one JSON object per query:
 
 The following values summarize the expected PigBDMR performance on the released test setting.
 
-| Model | G-mAP | 1-tgt | 2-tgt | 3+tgt | mIoU@1 | mR@1 | Short G-mAP | Middle G-mAP | Long G-mAP || Checkpoint |
+| Model | G-mAP | 1-tgt | 2-tgt | 3+tgt | mIoU@1 | mR@1 | Short G-mAP | Middle G-mAP | Long G-mAP | Checkpoint |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | PigBDMR | 35.22±0.73 | 40.07±1.07 | 27.79±0.51 | 16.54±2.20 | 50.08±1.01 | 42.51±0.80 | 5.51±0.90 | 29.06±0.56 | 52.02±1.26 | [model_best.ckpt]() |
 

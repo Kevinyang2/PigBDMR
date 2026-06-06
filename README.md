@@ -84,8 +84,7 @@ PigMMR/
       └── pig_text_features/
 ```
 
-The Baidu Netdisk package and this Git repository do not include training annotations. To train PigBDMR, prepare your own training JSONL file with the same schema and pass it with `--train_path`.
-
+ 
 Each annotation record follows the moment retrieval format:
 
 ```json

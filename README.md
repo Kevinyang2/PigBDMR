@@ -64,6 +64,12 @@ conda activate pigbdmr
 pip install -r requirements.txt
 ```
 
+On Windows PowerShell, add the repository root to `PYTHONPATH` before running training or inference:
+
+```powershell
+$env:PYTHONPATH = (Get-Location).Path
+```
+
 
 ### 2.2 Data, Features, and Checkpoints
 
@@ -114,6 +120,8 @@ See `data/README.md`, `features/README.md`, and `checkpoints/README.md` for deta
 ### 3.1 Train
 
 Training requires user-prepared training annotations and extracted features. The public repository does not include the training JSONL file.
+
+Run the command from the repository root. On Windows PowerShell, set `PYTHONPATH` first with `$env:PYTHONPATH = (Get-Location).Path`.
 
 ```bash
 python PigBDMR/train.py data/MR.py \

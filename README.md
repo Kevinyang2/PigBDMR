@@ -141,7 +141,7 @@ python PigBDMR/train.py data/MR.py \
   --lw_pv 9.0 --lw_pv1 0.7
 ```
 
-`--num_virtual_tokens` controls the number of Virtual Encoder tokens. `--num_dummies` remains a backward-compatible legacy alias for existing checkpoints and scripts.
+`--num_virtual_tokens` controls the number of Virtual Encoder tokens. 
 
 ### 3.2 Evaluation
 

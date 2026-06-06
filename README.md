@@ -127,7 +127,7 @@ python PigBDMR/train.py data/MR.py \
   --exp_id pigbdmr_train \
   --use_neg --dset_name hl --ctx_mode video_tef \
   --train_path /path/to/train.jsonl \
-  --eval_path data/QV-M2/test.jsonl \
+  --eval_path /path/to/test.jsonl \
   --v_feat_dirs features/pig_slowfast_features features/pig_clip_features \
   --v_feat_dim 2816 \
   --t_feat_dir features/pig_text_features \

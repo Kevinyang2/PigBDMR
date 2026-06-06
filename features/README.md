@@ -1,13 +1,22 @@
 # Features
 
-Pre-extracted features are not stored in Git. Download them from Baidu Netdisk, then place them under this directory.
+Pre-extracted features are not stored in Git. They are included in the PigMMR Baidu Netdisk package; download them and place the feature folders under this directory.
 
 ```text
 Link: https://pan.baidu.com/s/1nb4DeaZHwt0ie0kQ5_F0FQ
 Extraction code: best
 ```
 
-Expected layout for the default PigBDMR setup:
+The downloaded package contains:
+
+```text
+PigMMR/features/
+  pig_slowfast_features/
+  pig_clip_features/
+  pig_text_features/
+```
+
+Expected layout inside this repository for the default PigBDMR setup:
 
 ```text
 features/

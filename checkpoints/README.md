@@ -1,6 +1,6 @@
 # Checkpoints
 
-Model checkpoints are not stored in Git. Download them from the project release page or model card, then place them under this directory.
+Model checkpoints are not stored in Git and are not included in the PigMMR Baidu Netdisk dataset package. If checkpoints are released separately, place them under this directory.
 
 Recommended layout:
 

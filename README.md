@@ -78,7 +78,7 @@ export PYTHONPATH="$PYTHONPATH:."
 
 ### 2.2 Data, Features, and Checkpoints
 
-The PigMMR test annotations and pre-extracted features can be downloaded from Baidu Netdisk:
+The PigMMR Baidu Netdisk package provides the public test annotations, video mapping file, and pre-extracted features:
 
 ```text
 Link: https://pan.baidu.com/s/1nb4DeaZHwt0ie0kQ5_F0FQ
@@ -98,13 +98,13 @@ PigMMR/
       └── pig_text_features/
 ```
 
-This repository also includes a copy of the public test annotations for evaluation:
+This Git repository also includes a copy of the public test annotations for direct evaluation:
 
 ```text
 data/QV-M2/test.jsonl
 ```
 
-Training annotations are not included in this Git repository. To train PigBDMR, prepare your own training JSONL file with the same schema and pass it with `--train_path`.
+The Baidu Netdisk package and this Git repository do not include training annotations. To train PigBDMR, prepare your own training JSONL file with the same schema and pass it with `--train_path`.
 
 Each annotation record follows the moment retrieval format:
 
@@ -120,7 +120,7 @@ Each annotation record follows the moment retrieval format:
 }
 ```
 
-Feature files and model checkpoints are released outside Git to keep the repository lightweight. After downloading the features, place them as follows:
+Feature files are provided by the Baidu Netdisk package and are not stored in Git. Place the downloaded feature folders under this repository as follows, or pass their paths through the command-line arguments:
 
 ```text
 PigBDMR/
@@ -128,6 +128,12 @@ PigBDMR/
   │   ├── pig_slowfast_features/
   │   ├── pig_clip_features/
   │   └── pig_text_features/
+```
+
+Model checkpoints are not included in the Baidu Netdisk dataset package or in Git. If checkpoints are released separately, place them under:
+
+```text
+PigBDMR/
   └── checkpoints/
       └── pigbdmr/
           ├── model_best.ckpt
@@ -192,7 +198,7 @@ The prediction file should contain one JSON object per query:
 
 ## 4. Expected Performance
 
-The following values summarize the expected PigBDMR performance on the released test setting. Checkpoints and feature files will be distributed outside Git.
+The following values summarize the expected PigBDMR performance on the released test setting. Feature files are available from the Baidu Netdisk package above; checkpoints are not stored in Git.
 
 | Model | G-mAP | 1-tgt | 2-tgt | 3+tgt | mIoU@1 | mR@1 | Short G-mAP | Middle G-mAP | Long G-mAP |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|

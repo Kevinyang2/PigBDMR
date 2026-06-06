@@ -1,6 +1,6 @@
 # Data
 
-The PigMMR test annotations can be downloaded from Baidu Netdisk:
+The PigMMR Baidu Netdisk package provides the public test annotations and video mapping file:
 
 ```text
 Link: https://pan.baidu.com/s/1nb4DeaZHwt0ie0kQ5_F0FQ
@@ -15,13 +15,13 @@ data/
   video_chunks.csv
 ```
 
-This repository includes a copy of the public test annotations used for evaluation:
+This Git repository includes a copy of the public test annotations used for evaluation:
 
 ```text
 data/QV-M2/test.jsonl
 ```
 
-Training annotations are not included in the Git repository. To train PigBDMR, prepare a training JSONL file with the same schema and pass it to `PigBDMR/train.py` with `--train_path`.
+The Baidu Netdisk package and this Git repository do not include training annotations. To train PigBDMR, prepare a training JSONL file with the same schema and pass it to `PigBDMR/train.py` with `--train_path`.
 
 ## Annotation Schema
 

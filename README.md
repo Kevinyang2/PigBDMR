@@ -64,17 +64,6 @@ conda activate pigbdmr
 pip install -r requirements.txt
 ```
 
-On Windows, make the repository importable before running scripts:
-
-```powershell
-$env:PYTHONPATH = "$PWD"
-```
-
-On Linux/macOS:
-
-```bash
-export PYTHONPATH="$PYTHONPATH:."
-```
 
 ### 2.2 Data, Features, and Checkpoints
 
@@ -120,25 +109,6 @@ Each annotation record follows the moment retrieval format:
 }
 ```
 
-Feature files are provided by the Baidu Netdisk package and are not stored in Git. Place the downloaded feature folders under this repository as follows, or pass their paths through the command-line arguments:
-
-```text
-PigBDMR/
-  ├── features/
-  │   ├── pig_slowfast_features/
-  │   ├── pig_clip_features/
-  │   └── pig_text_features/
-```
-
-Model checkpoints are not included in the Baidu Netdisk dataset package or in Git. If checkpoints are released separately, place them under:
-
-```text
-PigBDMR/
-  └── checkpoints/
-      └── pigbdmr/
-          ├── model_best.ckpt
-          └── opt.json
-```
 
 The default feature settings are:
 

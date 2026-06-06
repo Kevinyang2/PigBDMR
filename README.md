@@ -113,7 +113,7 @@ The default feature settings are:
 - SlowFast + CLIP visual features: `--v_feat_dim 2816`
 - CLIP text features: `--t_feat_dim 512`
 
-See `data/README.md`, `features/README.md`, and `checkpoints/README.md` for details.
+The repository includes `data/MR.py` as the model configuration. Feature files and annotations should be placed or referenced according to the paths passed in the training and inference commands.
 
 ## 3. Run
 

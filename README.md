@@ -86,12 +86,6 @@ PigMMR/
       └── pig_text_features/
 ```
 
-This Git repository also includes a copy of the public test annotations for direct evaluation:
-
-```text
-data/QV-M2/test.jsonl
-```
-
 The Baidu Netdisk package and this Git repository do not include training annotations. To train PigBDMR, prepare your own training JSONL file with the same schema and pass it with `--train_path`.
 
 Each annotation record follows the moment retrieval format:

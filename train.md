@@ -10,9 +10,9 @@ conda run -n pigbdmr --no-capture-output python PigBDMR/train.py data/MR.py \
   --use_neg --dset_name hl --ctx_mode video_tef \
   --train_path /path/to/train.jsonl \
   --eval_path data/QV-M2/test.jsonl \
-  --v_feat_dirs features/slowfast_features features/clip_features \
+  --v_feat_dirs features/pig_slowfast_features features/pig_clip_features \
   --v_feat_dim 2816 \
-  --t_feat_dir features/clip_text_features_new \
+  --t_feat_dir features/pig_text_features \
   --t_feat_dim 512 \
   --max_v_l 75 --max_q_l 40 --max_windows 5 \
   --bsz 64 --n_epoch 150 --eval_bsz 1 --eval_epoch 3 \
@@ -25,6 +25,6 @@ conda run -n pigbdmr --no-capture-output python PigBDMR/train.py data/MR.py \
 
 ## Notes
 
-- `features/` must contain the downloaded SlowFast, CLIP visual, and CLIP text features.
+- `features/` must contain the downloaded `pig_slowfast_features`, `pig_clip_features`, and `pig_text_features` directories.
 - Training outputs are written to `results/`, which is ignored by Git.
 - Evaluation uses the public test annotations in `data/QV-M2/test.jsonl`.

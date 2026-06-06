@@ -1,6 +1,21 @@
 # Data
 
-This release includes only the public test annotations used for evaluation:
+The PigMMR test annotations can be downloaded from Baidu Netdisk:
+
+```text
+Link: https://pan.baidu.com/s/1nb4DeaZHwt0ie0kQ5_F0FQ
+Extraction code: best
+```
+
+The downloaded `data` directory contains:
+
+```text
+data/
+  test.jsonl
+  video_chunks.csv
+```
+
+This repository includes a copy of the public test annotations used for evaluation:
 
 ```text
 data/QV-M2/test.jsonl

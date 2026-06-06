@@ -13,4 +13,4 @@ checkpoints/
 
 `model_best.ckpt` contains model weights. `opt.json` records the training configuration and is useful for reproducing inference settings.
 
-Checkpoint files such as `.ckpt`, `.pth`, and `.pt` are ignored by Git.
+

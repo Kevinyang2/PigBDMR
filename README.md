@@ -71,7 +71,7 @@ The PigMMR Baidu Netdisk package provides the public test annotations, video map
 
 [PigMMR data link](https://pan.baidu.com/s/1nb4DeaZHwt0ie0kQ5_F0FQ)
 
-[Checkpoint Link]()
+[Checkpoint is coming]()
 
 The downloaded directory is organized as follows:
 

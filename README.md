@@ -15,7 +15,7 @@
     - [2.2 Data, Features, and Checkpoints](#22-data-features-and-checkpoints)
   - [3. Run](#3-run)
     - [3.1 Train](#31-train)
-    - [3.2 Evaluation](#32-evaluation)
+    - [3.2 Inference](#32-inference)
   - [4. Expected Performance](#4-expected-performance)
   - [5. References](#5-references)
   - [6. Acknowledgements](#6-acknowledgements)
@@ -136,18 +136,29 @@ python PigBDMR/train.py data/MR.py \
 
 `--num_virtual_tokens` controls the number of Virtual Encoder tokens. 
 
-### 3.2 Evaluation
+### 3.2 Inference
 
-To recompute temporal moment retrieval metrics for a prediction file:
+After placing the downloaded features and a trained checkpoint under the expected directories, run inference on the PigMMR test set with:
 
 ```bash
-python standalone_eval/eval.py \
-  --submission_path results/<exp>/hl_val_epoch_<N>_submission_nms_thd_0.7.jsonl \
-  --gt_path /path/to/test.jsonl \
-  --save_path results/<exp>/metrics.json
+python PigBDMR/inference.py data/MR.py \
+  --resume checkpoints/pigbdmr/model_best.ckpt \
+  --eval_split_name val \
+  --eval_path /path/to/PigMMR/data/test.jsonl \
+  --eval_results_dir results/pigbdmr_inference \
+  --nms_thd 0.7
 ```
 
-The prediction file should contain one JSON object per query:
+The command writes prediction files and metrics to `results/pigbdmr_inference/`, including:
+
+```text
+hl_val_submission.jsonl
+hl_val_submission_metrics.json
+hl_val_submission_nms_thd_0.7.jsonl
+hl_val_submission_nms_thd_0.7_metrics.json
+```
+
+The prediction file contains one JSON object per query:
 
 ```json
 {
@@ -156,6 +167,15 @@ The prediction file should contain one JSON object per query:
   "vid": "multi_0007",
   "pred_relevant_windows": [[22.0, 76.0, 0.8905], [0.0, 14.0, 0.7536]]
 }
+```
+
+If you already have a prediction file and only want to recompute metrics, run:
+
+```bash
+python standalone_eval/eval.py \
+  --submission_path results/pigbdmr_inference/hl_val_submission_nms_thd_0.7.jsonl \
+  --gt_path /path/to/PigMMR/data/test.jsonl \
+  --save_path results/pigbdmr_inference/metrics.json
 ```
 
 ## 4. Expected Performance

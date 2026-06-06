@@ -519,10 +519,5 @@ def start_inference(train_opt=None, split=None, splitfile=None):
         )
 
 
-from sys import argv
-
 if __name__ == "__main__":
-    # split, splitfile = argv
-    _, _, _, _, _, split, _, splitfile = argv
-
-    start_inference(split=split, splitfile=splitfile)
+    start_inference()

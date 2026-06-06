@@ -158,7 +158,7 @@ The prediction file should contain one JSON object per query:
 
 ## 4. Expected Performance
 
-The following values summarize the expected PigBDMR performance on the released test setting. Results are reported as mean±std over three deterministic seeds: 42, 123, and 2024. Feature files are available from the Baidu Netdisk package above; checkpoints are not stored in Git.
+The following values summarize the expected PigBDMR performance on the released test setting. Results are reported as mean±std over three deterministic seeds: 42, 123, and 2024. Feature files are available from the Baidu Netdisk package above; 
 
 | Model | G-mAP | 1-tgt | 2-tgt | 3+tgt | mIoU@1 | mR@1 | Short G-mAP | Middle G-mAP | Long G-mAP |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|

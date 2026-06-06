@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Text-to-Video Multi-Moment Retrieval via Adaptive Virtual Token Alignment for Pig Behavior Analysis in Surveillance Videos"
+message: "If you use PigBDMR, please cite the associated paper. This citation file will be updated after publication."
+type: software
+authors:
+  - name: "Kevinyang2"
+year: 2026
+license: Apache-2.0

@@ -1,0 +1,59 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Local agent/session state
+AGENTS.md
+.sisyphus/
+
+# Results (large, gitignored)
+results/
+eval_results/
+debug_results/
+logs/
+reports/
+
+# Features and model artifacts (released externally, not in Git)
+features/*
+checkpoints/*
+!features/README.md
+!checkpoints/README.md
+*.ckpt
+*.pth
+*.pt
+*.npz
+*.npy
+*.pkl
+
+# Demo/media artifacts
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Local databases and private UI state
+*.db
+*.sqlite
+*.sqlite3
+pig_query_system/users.db
+
+# External/vendor repositories not part of this release
+CGSTVG/
+
+# Private training annotations are kept locally only
+data/QV-M2/train.jsonl
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+*.egg-info/
+dist/
+build/
+
+# Temp
+*.swp
+*.swo
+*~

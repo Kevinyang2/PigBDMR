@@ -149,14 +149,6 @@ python PigBDMR/inference.py data/MR.py \
   --nms_thd 0.7
 ```
 
-The command writes prediction files and metrics to `results/pigbdmr_inference/`, including:
-
-```text
-hl_val_submission.jsonl
-hl_val_submission_metrics.json
-hl_val_submission_nms_thd_0.7.jsonl
-hl_val_submission_nms_thd_0.7_metrics.json
-```
 
 The prediction file contains one JSON object per query:
 

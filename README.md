@@ -150,7 +150,7 @@ To recompute temporal moment retrieval metrics for a prediction file:
 ```bash
 python standalone_eval/eval.py \
   --submission_path results/<exp>/hl_val_epoch_<N>_submission_nms_thd_0.7.jsonl \
-  --gt_path data/QV-M2/test.jsonl \
+  --gt_path /path/to/test.jsonl \
   --save_path results/<exp>/metrics.json
 ```
 

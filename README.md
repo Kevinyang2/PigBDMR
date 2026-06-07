@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-green.svg)](requirements.txt)
 
-[Project Demo]([docs/](https://kevinyang2.github.io/PigBDMR/#demo))
+[Project Demo](https://kevinyang2.github.io/PigBDMR/#demo)
 
 **:star: If PigBDMR is helpful to your project, please consider starring this repository. Thanks!**
 

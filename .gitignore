@@ -32,7 +32,6 @@ checkpoints/*
 
 # Demo/media artifacts
 *.mp4
-!docs/assets/*.mp4
 *.avi
 *.mov
 *.mkv

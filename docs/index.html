@@ -407,6 +407,23 @@
     }
     .score-card small { color: var(--muted); font-weight: 700; }
     .score-card strong { display: block; font-size: 30px; margin-top: 2px; letter-spacing: -0.04em; }
+    .progress-card {
+      display: none;
+      margin: 18px 0;
+      border: 1px solid rgba(56, 189, 248, 0.26);
+      border-radius: 22px;
+      padding: 18px;
+      background: linear-gradient(135deg, rgba(8, 47, 73, 0.44), rgba(15, 23, 42, 0.62));
+    }
+    .progress-card.active { display: block; }
+    .progress-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .progress-top strong { font-size: 15px; }
+    .progress-top span { color: #bae6fd; font-size: 12px; font-weight: 800; }
+    .progress-track { height: 12px; border-radius: 999px; overflow: hidden; background: rgba(2, 6, 23, 0.56); border: 1px solid rgba(148, 163, 184, 0.18); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue-2), var(--blue), var(--green)); box-shadow: 0 0 22px rgba(56, 189, 248, 0.44); }
+    .progress-card.active .progress-fill { animation: infer 1s ease forwards; }
+    @keyframes infer { from { width: 4%; } to { width: 100%; } }
+    .results-body[hidden] { display: none; }
     .timeline-wrap { margin-top: 22px; border: 1px solid var(--line); border-radius: 24px; padding: 20px; background: rgba(2, 6, 23, 0.34); }
     .timeline-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-bottom: 12px; }
     .timeline {
@@ -449,6 +466,19 @@
     .table td { color: #e5edf8; background: rgba(2, 6, 23, 0.22); }
     .rank { color: var(--blue); font-weight: 900; }
     .pill { display: inline-flex; border-radius: 999px; padding: 5px 9px; background: rgba(56, 189, 248, 0.12); color: #bae6fd; font-size: 12px; font-weight: 800; }
+    .segment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+    .segment-card {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.52);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .segment-card:hover { transform: translateY(-2px); border-color: rgba(56, 189, 248, 0.54); background: rgba(8, 47, 73, 0.32); }
+    .segment-card small { color: var(--muted); font-weight: 800; }
+    .segment-card strong { display: block; margin: 7px 0 6px; font-size: 17px; }
+    .segment-card span { color: #bae6fd; font-size: 12px; }
 
     .architecture {
       display: grid;
@@ -496,6 +526,7 @@
       .section-title { align-items: flex-start; flex-direction: column; }
       .table { font-size: 12px; }
       .table th, .table td { padding: 10px 8px; }
+      .segment-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -561,11 +592,9 @@
 
         <label class="label" for="video">Video stream</label>
         <select id="video">
-          <option value="multi_0007">multi_0007 / 149.8s</option>
-          <option value="multi_0013">multi_0013 / 182.4s</option>
-          <option value="multi_0021">multi_0021 / 121.6s</option>
+          <option value="multi_0007">multi_0007 / 149.8s / best-matched demo video</option>
         </select>
-        <button class="button run" id="run" type="button">Run visualization</button>
+        <button class="button run" id="run" type="button">Start Inference</button>
         <p class="hint">GitHub Pages cannot run PyTorch. The interface is designed for precomputed JSONL predictions or an external inference API.</p>
       </aside>
 
@@ -575,37 +604,46 @@
             <h3 id="result-title">Feeding retrieval</h3>
             <div class="hint" id="result-subtitle">Query matched to repeated feeder-side activity.</div>
           </div>
-          <div class="badge"><span class="pulse"></span><span id="status">3 moments found</span></div>
+          <div class="badge"><span class="pulse"></span><span id="status">Ready for inference</span></div>
         </div>
 
-        <div class="video-card">
-          <div class="preview">
-            <video class="demo-video" muted loop playsinline controls aria-label="Interactive pig behavior video">
+        <div class="progress-card" id="progress-card">
+          <div class="progress-top"><strong>Running PigBDMR inference</strong><span id="progress-label">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+
+        <div class="results-body" id="results-body" hidden>
+          <div class="video-card">
+            <div class="preview">
+            <video class="demo-video" id="demo-video" muted loop playsinline controls aria-label="Interactive pig behavior video">
               <source src="assets/pig_demo.mp4" type="video/mp4">
             </video>
             <div class="video-vignette"></div>
             <div class="frame-title" id="frame-title">multi_0007 / active interval preview</div>
             <div class="zone feeder"></div>
             <div class="zone water"></div>
-            <div class="playhead"></div>
+              <div class="playhead"></div>
+            </div>
+            <div class="result-side">
+              <div class="score-card"><small>Top score</small><strong id="top-score">0.891</strong></div>
+              <div class="score-card"><small>Top interval</small><strong id="top-window">25.9s - 74.1s</strong></div>
+              <div class="score-card"><small>Behavior category</small><strong id="category">Feeding</strong></div>
+            </div>
           </div>
-          <div class="result-side">
-            <div class="score-card"><small>Top score</small><strong id="top-score">0.891</strong></div>
-            <div class="score-card"><small>Top interval</small><strong id="top-window">25.9s - 74.1s</strong></div>
-            <div class="score-card"><small>Behavior category</small><strong id="category">Feeding</strong></div>
+
+          <div class="segment-grid" id="segments"></div>
+
+          <div class="timeline-wrap">
+            <div class="timeline-meta"><span>0s</span><span id="duration-label">149.8s</span></div>
+            <div class="timeline" id="timeline"></div>
+            <div class="legend"><span><i></i> Predicted moments</span><span class="gt"><i></i> Ground-truth moments when available</span></div>
           </div>
-        </div>
 
-        <div class="timeline-wrap">
-          <div class="timeline-meta"><span>0s</span><span id="duration-label">149.8s</span></div>
-          <div class="timeline" id="timeline"></div>
-          <div class="legend"><span><i></i> Predicted moments</span><span class="gt"><i></i> Ground-truth moments when available</span></div>
+          <table class="table" aria-label="Predicted retrieval windows">
+            <thead><tr><th>Rank</th><th>Start</th><th>End</th><th>Duration</th><th>Score</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
         </div>
-
-        <table class="table" aria-label="Predicted retrieval windows">
-          <thead><tr><th>Rank</th><th>Start</th><th>End</th><th>Duration</th><th>Score</th></tr></thead>
-          <tbody id="rows"></tbody>
-        </table>
       </section>
     </section>
 
@@ -635,42 +673,32 @@
       {
         query: "A pig eats from the feeder.",
         title: "Feeding retrieval",
-        subtitle: "Query matched to repeated feeder-side activity.",
+        subtitle: "Best-matched demo: three feeder-side moments from the same full-length video.",
         category: "Feeding",
         video: "multi_0007",
         duration: 149.8,
         gt: [[0.0, 15.1], [25.9, 74.1]],
-        moments: [[25.9, 74.1, 0.891], [0.0, 14.0, 0.754], [82.4, 96.2, 0.412]]
+        moments: [[25.9, 74.1, 0.891], [0.0, 15.1, 0.754], [82.4, 96.2, 0.412]]
       },
       {
-        query: "Two pigs fight or push each other.",
-        title: "Aggressive interaction retrieval",
-        subtitle: "Short and fragmented harmful-interaction candidates are highlighted.",
-        category: "Aggressive/harmful",
-        video: "multi_0013",
-        duration: 182.4,
-        gt: [[46.0, 61.5]],
-        moments: [[44.8, 62.0, 0.823], [118.5, 132.4, 0.517], [18.2, 25.6, 0.338]]
-      },
-      {
-        query: "A pig drinks water.",
-        title: "Drinking retrieval",
-        subtitle: "Water-area moments are ranked with compact temporal windows.",
-        category: "Drinking",
-        video: "multi_0021",
-        duration: 121.6,
-        gt: [[70.5, 91.3]],
-        moments: [[68.9, 92.0, 0.867], [31.4, 42.2, 0.488]]
-      },
-      {
-        query: "A pig lies on the floor.",
-        title: "Resting retrieval",
-        subtitle: "Longer low-motion intervals are localized as resting behavior.",
-        category: "Resting/lying",
+        query: "A pig stays near the feeder for a long time.",
+        title: "Long feeding-activity retrieval",
+        subtitle: "The top window covers the long feeder-side behavior in the full video.",
+        category: "Long feeding",
         video: "multi_0007",
         duration: 149.8,
-        gt: [[88.0, 137.0]],
-        moments: [[84.5, 139.2, 0.802], [37.2, 53.7, 0.365]]
+        gt: [[25.9, 74.1]],
+        moments: [[25.9, 74.1, 0.884], [82.4, 96.2, 0.426], [0.0, 15.1, 0.382]]
+      },
+      {
+        query: "A pig repeatedly approaches the feeder.",
+        title: "Repeated feeder-approach retrieval",
+        subtitle: "Three candidate moments are exposed as clickable video segments.",
+        category: "Repeated feeding",
+        video: "multi_0007",
+        duration: 149.8,
+        gt: [[0.0, 15.1], [25.9, 74.1]],
+        moments: [[0.0, 15.1, 0.807], [25.9, 74.1, 0.782], [82.4, 96.2, 0.433]]
       }
     ];
 
@@ -680,6 +708,12 @@
     const runEl = document.querySelector("#run");
     const rowsEl = document.querySelector("#rows");
     const timelineEl = document.querySelector("#timeline");
+    const segmentsEl = document.querySelector("#segments");
+    const resultsBody = document.querySelector("#results-body");
+    const progressCard = document.querySelector("#progress-card");
+    const progressLabel = document.querySelector("#progress-label");
+    const demoVideo = document.querySelector("#demo-video");
+    let selectedSample = samples[0];
 
     function fmt(value) { return `${value.toFixed(1)}s`; }
     function pct(value, duration) { return Math.max(0, Math.min(100, value / duration * 100)); }
@@ -689,6 +723,27 @@
       return samples.find(s => s.query.toLowerCase() === text)
         || samples.find(s => text.includes(s.category.toLowerCase().split("/")[0]))
         || samples[0];
+    }
+
+    function setSelected(sample) {
+      selectedSample = sample;
+      queryEl.value = sample.query;
+      videoEl.value = sample.video;
+      document.querySelector("#result-title").textContent = "Ready for PigBDMR inference";
+      document.querySelector("#result-subtitle").textContent = "Click Start Inference to run the one-second demo pipeline.";
+      document.querySelector("#status").textContent = "Ready for inference";
+      resultsBody.hidden = true;
+      progressCard.classList.remove("active");
+      progressLabel.textContent = "0%";
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.classList.toggle("active", chip.dataset.query === sample.query);
+      });
+    }
+
+    function seekTo(start) {
+      if (!demoVideo) return;
+      demoVideo.currentTime = Math.max(0, start);
+      demoVideo.play().catch(() => {});
     }
 
     function render(sample) {
@@ -706,6 +761,17 @@
         const dur = m[1] - m[0];
         return `<tr><td class="rank">#${i + 1}</td><td>${fmt(m[0])}</td><td>${fmt(m[1])}</td><td>${fmt(dur)}</td><td><span class="pill">${m[2].toFixed(3)}</span></td></tr>`;
       }).join("");
+
+      segmentsEl.innerHTML = sample.moments.map((m, i) => `
+        <button class="segment-card" type="button" data-start="${m[0]}">
+          <small>Demo segment ${i + 1}</small>
+          <strong>${fmt(m[0])} - ${fmt(m[1])}</strong>
+          <span>Score ${m[2].toFixed(3)} · click to seek</span>
+        </button>
+      `).join("");
+      segmentsEl.querySelectorAll(".segment-card").forEach(card => {
+        card.addEventListener("click", () => seekTo(Number(card.dataset.start)));
+      });
 
       timelineEl.innerHTML = "";
       [0.25, 0.5, 0.75].forEach(t => {
@@ -725,6 +791,7 @@
         el.title = `Rank ${i + 1}: ${fmt(m[0])} - ${fmt(m[1])}, score ${m[2].toFixed(3)}`;
         el.style.left = `${pct(m[0], sample.duration)}%`;
         el.style.width = `${Math.max(3, pct(m[1] - m[0], sample.duration))}%`;
+        el.addEventListener("click", () => seekTo(m[0]));
         timelineEl.appendChild(el);
       });
       sample.gt.forEach(g => {
@@ -739,6 +806,36 @@
       document.querySelectorAll(".chip").forEach(chip => {
         chip.classList.toggle("active", chip.dataset.query === sample.query);
       });
+      resultsBody.hidden = false;
+      seekTo(sample.moments[0][0]);
+    }
+
+    function runInference() {
+      const sample = pickSample();
+      selectedSample = sample;
+      runEl.disabled = true;
+      runEl.textContent = "Inferencing...";
+      resultsBody.hidden = true;
+      progressCard.classList.remove("active");
+      void progressCard.offsetWidth;
+      progressCard.classList.add("active");
+      document.querySelector("#status").textContent = "Inferencing...";
+      document.querySelector("#result-title").textContent = "Running PigBDMR inference";
+      document.querySelector("#result-subtitle").textContent = "Extracting query-conditioned temporal proposals from the demo video.";
+      let elapsed = 0;
+      progressLabel.textContent = "0%";
+      const timer = setInterval(() => {
+        elapsed += 100;
+        progressLabel.textContent = `${Math.min(100, Math.round(elapsed / 10))}%`;
+      }, 100);
+      setTimeout(() => {
+        clearInterval(timer);
+        progressLabel.textContent = "100%";
+        progressCard.classList.remove("active");
+        render(sample);
+        runEl.disabled = false;
+        runEl.textContent = "Start Inference";
+      }, 1000);
     }
 
     samples.forEach(sample => {
@@ -748,20 +845,16 @@
       chip.dataset.query = sample.query;
       chip.textContent = sample.category;
       chip.addEventListener("click", () => {
-        queryEl.value = sample.query;
-        render(sample);
+        setSelected(sample);
       });
       chipsEl.appendChild(chip);
     });
 
-    runEl.addEventListener("click", () => render(pickSample()));
+    runEl.addEventListener("click", runInference);
     videoEl.addEventListener("change", () => {
-      const current = pickSample();
-      const matched = samples.find(s => s.video === videoEl.value) || current;
-      queryEl.value = matched.query;
-      render(matched);
+      setSelected(selectedSample);
     });
-    render(samples[0]);
+    setSelected(samples[0]);
   </script>
 </body>
 </html>

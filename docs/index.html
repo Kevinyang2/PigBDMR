@@ -556,7 +556,7 @@
         <div class="monitor-top"><div class="dots"><span></span><span></span><span></span></div><span>CAM 07 / Pig pen surveillance</span></div>
         <div class="monitor">
           <video class="demo-video" autoplay muted loop playsinline aria-label="Pig pen demo video">
-            <source src="assets/pig_demo.mp4" type="video/mp4">
+            <source src="assets/demo1.mp4" type="video/mp4">
           </video>
           <div class="video-vignette"></div>
           <div class="pen-label">Behavior scene preview</div>
@@ -592,7 +592,9 @@
 
         <label class="label" for="video">Video stream</label>
         <select id="video">
-          <option value="multi_0007">multi_0007 / 149.8s / best-matched demo video</option>
+          <option value="demo1">demo1 / 149.8s / qid 114</option>
+          <option value="demo2">demo2 / 143.5s / qid 120</option>
+          <option value="demo3">demo3 / 168.9s / qid 10400</option>
         </select>
         <button class="button run" id="run" type="button">Start Inference</button>
         <p class="hint">GitHub Pages cannot run PyTorch. The interface is designed for precomputed JSONL predictions or an external inference API.</p>
@@ -616,10 +618,10 @@
           <div class="video-card">
             <div class="preview">
             <video class="demo-video" id="demo-video" muted loop playsinline controls aria-label="Interactive pig behavior video">
-              <source src="assets/pig_demo.mp4" type="video/mp4">
+              <source src="assets/demo1.mp4" type="video/mp4">
             </video>
             <div class="video-vignette"></div>
-            <div class="frame-title" id="frame-title">multi_0007 / active interval preview</div>
+            <div class="frame-title" id="frame-title">demo1 / active interval preview</div>
             <div class="zone feeder"></div>
             <div class="zone water"></div>
               <div class="playhead"></div>
@@ -673,32 +675,41 @@
       {
         query: "A pig eats from the feeder.",
         title: "Feeding retrieval",
-        subtitle: "Best-matched demo: three feeder-side moments from the same full-length video.",
+        subtitle: "qid 114 on demo1: ranked feeder-side eating moments from the full-length stream.",
         category: "Feeding",
-        video: "multi_0007",
+        qid: "114",
+        video: "demo1",
+        source: "assets/demo1.mp4",
+        originalVideo: "multi_0007",
         duration: 149.8,
-        gt: [[0.0, 15.1], [25.9, 74.1]],
-        moments: [[25.9, 74.1, 0.891], [0.0, 15.1, 0.754], [82.4, 96.2, 0.412]]
+        gt: [[30.0, 72.0]],
+        moments: [[30.0, 72.0, 0.779], [0.0, 14.0, 0.478], [24.0, 60.0, 0.474]]
       },
       {
-        query: "A pig stays near the feeder for a long time.",
-        title: "Long feeding-activity retrieval",
-        subtitle: "The top window covers the long feeder-side behavior in the full video.",
-        category: "Long feeding",
-        video: "multi_0007",
-        duration: 149.8,
-        gt: [[25.9, 74.1]],
-        moments: [[25.9, 74.1, 0.884], [82.4, 96.2, 0.426], [0.0, 15.1, 0.382]]
+        query: "A pig sniffs with its snout to the left of the feeder.",
+        title: "Sniffing retrieval",
+        subtitle: "qid 120 on demo2: candidate sniffing intervals near the feeder side.",
+        category: "Sniffing",
+        qid: "120",
+        video: "demo2",
+        source: "assets/demo2.mp4",
+        originalVideo: "multi_0013",
+        duration: 143.5,
+        gt: [[92.0, 108.0]],
+        moments: [[92.0, 108.0, 0.401], [64.0, 88.0, 0.379], [98.0, 112.0, 0.376]]
       },
       {
-        query: "A pig repeatedly approaches the feeder.",
-        title: "Repeated feeder-approach retrieval",
-        subtitle: "Three candidate moments are exposed as clickable video segments.",
-        category: "Repeated feeding",
-        video: "multi_0007",
-        duration: 149.8,
-        gt: [[0.0, 15.1], [25.9, 74.1]],
-        moments: [[0.0, 15.1, 0.807], [25.9, 74.1, 0.782], [82.4, 96.2, 0.433]]
+        query: "A pig walks to the drinker to drink water.",
+        title: "Drinking retrieval",
+        subtitle: "qid 10400 on demo3: drinking-related walking and water-point intervals.",
+        category: "Drinking",
+        qid: "10400",
+        video: "demo3",
+        source: "assets/demo3.mp4",
+        originalVideo: "single_0141",
+        duration: 168.9,
+        gt: [[74.0, 116.0]],
+        moments: [[74.0, 116.0, 0.761], [86.0, 120.0, 0.713], [100.0, 126.0, 0.354]]
       }
     ];
 
@@ -729,6 +740,7 @@
       selectedSample = sample;
       queryEl.value = sample.query;
       videoEl.value = sample.video;
+      loadVideo(sample, false);
       document.querySelector("#result-title").textContent = "Ready for PigBDMR inference";
       document.querySelector("#result-subtitle").textContent = "Click Start Inference to run the one-second demo pipeline.";
       document.querySelector("#status").textContent = "Ready for inference";
@@ -746,15 +758,24 @@
       demoVideo.play().catch(() => {});
     }
 
+    function loadVideo(sample, autoplay) {
+      if (!demoVideo || demoVideo.dataset.source === sample.source) return;
+      demoVideo.dataset.source = sample.source;
+      demoVideo.src = sample.source;
+      demoVideo.load();
+      if (autoplay) demoVideo.play().catch(() => {});
+    }
+
     function render(sample) {
       videoEl.value = sample.video;
+      loadVideo(sample, true);
       document.querySelector("#result-title").textContent = sample.title;
       document.querySelector("#result-subtitle").textContent = sample.subtitle;
       document.querySelector("#status").textContent = `${sample.moments.length} moments found`;
       document.querySelector("#top-score").textContent = sample.moments[0][2].toFixed(3);
       document.querySelector("#top-window").textContent = `${fmt(sample.moments[0][0])} - ${fmt(sample.moments[0][1])}`;
       document.querySelector("#category").textContent = sample.category;
-      document.querySelector("#frame-title").textContent = `${sample.video} / active interval preview`;
+      document.querySelector("#frame-title").textContent = `${sample.video} (${sample.originalVideo}) / active interval preview`;
       document.querySelector("#duration-label").textContent = fmt(sample.duration);
 
       rowsEl.innerHTML = sample.moments.map((m, i) => {
@@ -811,8 +832,9 @@
     }
 
     function runInference() {
-      const sample = pickSample();
+      const sample = samples.find(s => s.video === videoEl.value) || pickSample();
       selectedSample = sample;
+      queryEl.value = sample.query;
       runEl.disabled = true;
       runEl.textContent = "Inferencing...";
       resultsBody.hidden = true;
@@ -852,7 +874,8 @@
 
     runEl.addEventListener("click", runInference);
     videoEl.addEventListener("change", () => {
-      setSelected(selectedSample);
+      const sample = samples.find(s => s.video === videoEl.value) || samples[0];
+      setSelected(sample);
     });
     setSelected(samples[0]);
   </script>

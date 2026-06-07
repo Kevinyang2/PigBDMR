@@ -9,6 +9,10 @@ AGENTS.md
 
 # Results (large, gitignored)
 results/
+!results/
+results/*
+!results/pigbdmr_inference/
+!results/pigbdmr_inference/.gitkeep
 eval_results/
 debug_results/
 logs/

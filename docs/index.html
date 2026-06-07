@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PigBDMR Demo</title>
+  <meta name="description" content="Interactive PigBDMR text-to-video multi-moment retrieval demo.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --bg-2: #0b1728;
+      --card: rgba(15, 23, 42, 0.72);
+      --card-strong: rgba(15, 23, 42, 0.92);
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #e5edf8;
+      --muted: #93a4ba;
+      --blue: #38bdf8;
+      --blue-2: #2563eb;
+      --green: #34d399;
+      --amber: #f59e0b;
+      --red: #fb7185;
+      --violet: #a78bfa;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 16% 8%, rgba(56, 189, 248, 0.2), transparent 28rem),
+        radial-gradient(circle at 84% 18%, rgba(167, 139, 250, 0.18), transparent 24rem),
+        radial-gradient(circle at 60% 88%, rgba(52, 211, 153, 0.12), transparent 26rem),
+        linear-gradient(145deg, #07111f 0%, #0a1220 44%, #0d1728 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 82%);
+    }
+
+    a { color: inherit; }
+    .shell { width: min(1440px, calc(100% - 40px)); margin: 0 auto; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: 0.02em; }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(167, 139, 250, 0.92));
+      box-shadow: 0 16px 40px rgba(56, 189, 248, 0.25);
+      color: #06111f;
+      font-weight: 900;
+    }
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 10px 14px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      transition: all 180ms ease;
+      font-size: 14px;
+    }
+    .nav-links a:hover { color: var(--text); border-color: var(--line); background: rgba(15, 23, 42, 0.55); }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      padding: 48px 0 26px;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      color: #b9e8ff;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 999px;
+      background: rgba(8, 47, 73, 0.36);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 7px rgba(52, 211, 153, 0.13);
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(42px, 7vw, 92px);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+    }
+    .gradient-text {
+      background: linear-gradient(110deg, #f8fbff 0%, #93e2ff 34%, #c5b8ff 72%, #d7ffe9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero-copy {
+      max-width: 720px;
+      color: #b6c6da;
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.65;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-weight: 800;
+      color: #04101f;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      box-shadow: 0 18px 42px rgba(56, 189, 248, 0.22);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 22px 52px rgba(56, 189, 248, 0.32); }
+    .button.secondary { color: var(--text); background: rgba(15, 23, 42, 0.78); border: 1px solid var(--line); box-shadow: none; }
+
+    .hero-card {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(15, 23, 42, 0.52));
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 480px;
+      backdrop-filter: blur(18px);
+    }
+
+    .monitor-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dots { display: flex; gap: 8px; }
+    .dots span { width: 10px; height: 10px; border-radius: 999px; background: #64748b; }
+    .dots span:nth-child(1) { background: var(--red); }
+    .dots span:nth-child(2) { background: var(--amber); }
+    .dots span:nth-child(3) { background: var(--green); }
+
+    .monitor {
+      position: relative;
+      height: 360px;
+      margin: 22px;
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(145deg, #172033, #0b1628 64%, #0d2630);
+      background-size: 54px 54px, 54px 54px, cover;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .monitor::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 0 42%, rgba(56, 189, 248, 0.16) 48%, transparent 56% 100%);
+      animation: scan 4.8s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes scan { 0%, 100% { transform: translateX(-80%); } 45%, 60% { transform: translateX(55%); } }
+
+    .pen-label {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .pig {
+      position: absolute;
+      width: 52px;
+      height: 36px;
+      border-radius: 999px 999px 18px 18px;
+      background: linear-gradient(135deg, #f7a7b5, #fb7185);
+      box-shadow: inset -10px -8px 0 rgba(129, 34, 56, 0.18), 0 14px 28px rgba(0, 0, 0, 0.22);
+      z-index: 1;
+    }
+    .pig::before, .pig::after { content: ""; position: absolute; background: #ffd3dc; }
+    .pig::before { width: 17px; height: 17px; right: -6px; top: 7px; border-radius: 50%; }
+    .pig::after { width: 6px; height: 6px; right: -1px; top: 12px; border-radius: 50%; background: #7f1d1d; }
+    .p1 { left: 11%; top: 55%; transform: rotate(-8deg); animation: drift1 7s ease-in-out infinite; }
+    .p2 { left: 58%; top: 28%; transform: rotate(12deg); animation: drift2 6.6s ease-in-out infinite; }
+    .p3 { left: 72%; top: 66%; transform: rotate(-16deg); animation: drift3 8s ease-in-out infinite; }
+    @keyframes drift1 { 50% { transform: translate(30px, -12px) rotate(2deg); } }
+    @keyframes drift2 { 50% { transform: translate(-20px, 18px) rotate(-10deg); } }
+    @keyframes drift3 { 50% { transform: translate(-28px, -18px) rotate(10deg); } }
+    .zone {
+      position: absolute;
+      border: 1px dashed rgba(56, 189, 248, 0.34);
+      background: rgba(56, 189, 248, 0.06);
+      border-radius: 18px;
+      z-index: 0;
+    }
+    .feeder { left: 8%; top: 16%; width: 28%; height: 18%; }
+    .water { right: 10%; bottom: 12%; width: 23%; height: 16%; border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.06); }
+    .overlay-card {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: min(310px, calc(100% - 36px));
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 20px;
+      padding: 16px;
+      z-index: 3;
+    }
+    .overlay-card strong { display: block; margin-bottom: 8px; font-size: 15px; }
+    .overlay-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 0 22px 22px;
+    }
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.56);
+    }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .stat b { display: block; margin-top: 4px; font-size: 22px; }
+
+    .section-title { margin: 66px 0 18px; display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+    .section-title h2 { margin: 0; font-size: clamp(28px, 4vw, 48px); letter-spacing: -0.045em; }
+    .section-title p { max-width: 640px; margin: 0; color: var(--muted); line-height: 1.6; }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 22px;
+      margin-bottom: 70px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .control { padding: 22px; position: sticky; top: 14px; height: fit-content; }
+    .panel h3 { margin: 0 0 14px; letter-spacing: -0.02em; font-size: 18px; }
+    .label { display: block; margin: 18px 0 8px; color: #cbd5e1; font-size: 13px; font-weight: 800; }
+    textarea, select {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.46);
+      color: var(--text);
+      padding: 14px 15px;
+      outline: none;
+      font: inherit;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    textarea:focus, select:focus { border-color: rgba(56, 189, 248, 0.62); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.62);
+      color: #c8d7ea;
+      border-radius: 999px;
+      padding: 9px 11px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 150ms ease;
+    }
+    .chip:hover, .chip.active { border-color: rgba(56, 189, 248, 0.62); color: white; transform: translateY(-1px); }
+    .run { width: 100%; justify-content: center; margin-top: 18px; }
+    .hint { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .output { padding: 22px; }
+    .output-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .badge {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      color: #baf7dc;
+      background: rgba(6, 78, 59, 0.28);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .video-card {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .preview {
+      min-height: 360px;
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.19);
+      background:
+        radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.13), transparent 32%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        #0b1728;
+      background-size: cover, 48px 48px, 48px 48px, cover;
+      position: relative;
+      overflow: hidden;
+    }
+    .frame-title {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 2;
+      font-size: 12px;
+      color: #dbeafe;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.58);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .playhead {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, var(--blue), transparent);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.9);
+      animation: play 5.5s linear infinite;
+      z-index: 2;
+    }
+    @keyframes play { from { left: 8%; } to { left: 92%; } }
+    .preview .pig { transform: scale(1.15); }
+    .preview .p1 { left: 18%; top: 62%; }
+    .preview .p2 { left: 54%; top: 34%; }
+    .preview .p3 { left: 70%; top: 58%; }
+
+    .result-side { display: grid; gap: 12px; }
+    .score-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+      background: rgba(2, 6, 23, 0.36);
+    }
+    .score-card small { color: var(--muted); font-weight: 700; }
+    .score-card strong { display: block; font-size: 30px; margin-top: 2px; letter-spacing: -0.04em; }
+    .timeline-wrap { margin-top: 22px; border: 1px solid var(--line); border-radius: 24px; padding: 20px; background: rgba(2, 6, 23, 0.34); }
+    .timeline-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    .timeline {
+      position: relative;
+      height: 78px;
+      border-radius: 18px;
+      background: linear-gradient(90deg, rgba(148, 163, 184, 0.22), rgba(148, 163, 184, 0.09));
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .moment {
+      position: absolute;
+      top: 18px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue-2), var(--blue));
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.32);
+      cursor: pointer;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+    .moment:hover { transform: translateY(-2px); filter: brightness(1.2); }
+    .moment.gt { top: 50px; height: 10px; background: linear-gradient(90deg, var(--green), #86efac); box-shadow: none; opacity: 0.9; }
+    .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(226, 232, 240, 0.13); }
+    .tick-label { position: absolute; bottom: 5px; transform: translateX(-50%); color: rgba(226, 232, 240, 0.44); font-size: 11px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 13px; color: var(--muted); font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .legend i { width: 18px; height: 8px; border-radius: 999px; display: inline-block; background: var(--blue); }
+    .legend .gt i { background: var(--green); }
+
+    .table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      font-size: 14px;
+    }
+    .table th, .table td { padding: 13px 12px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.14); }
+    .table th { color: #cbd5e1; background: rgba(15, 23, 42, 0.72); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .table td { color: #e5edf8; background: rgba(2, 6, 23, 0.22); }
+    .rank { color: var(--blue); font-weight: 900; }
+    .pill { display: inline-flex; border-radius: 999px; padding: 5px 9px; background: rgba(56, 189, 248, 0.12); color: #bae6fd; font-size: 12px; font-weight: 800; }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 72px;
+    }
+    .step {
+      position: relative;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.58);
+      border-radius: 24px;
+      padding: 20px;
+      min-height: 176px;
+      overflow: hidden;
+    }
+    .step::before { content: ""; position: absolute; inset: auto -40px -50px auto; width: 130px; height: 130px; border-radius: 999px; background: rgba(56, 189, 248, 0.11); }
+    .step b { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; background: rgba(56, 189, 248, 0.14); color: #bae6fd; margin-bottom: 14px; }
+    .step h3 { margin: 0 0 8px; }
+    .step p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+
+    footer {
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding: 28px 0 42px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1080px) {
+      .hero, .demo-grid, .video-card { grid-template-columns: 1fr; }
+      .control { position: static; }
+      .architecture { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 24px, 1440px); }
+      .nav { align-items: flex-start; gap: 16px; flex-direction: column; }
+      .nav-links { flex-wrap: wrap; }
+      .hero { padding-top: 30px; }
+      .hero-card, .panel { border-radius: 22px; }
+      .monitor { margin: 14px; height: 300px; }
+      .stats-strip, .architecture { grid-template-columns: 1fr; }
+      .section-title { align-items: flex-start; flex-direction: column; }
+      .table { font-size: 12px; }
+      .table th, .table td { padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell nav">
+    <div class="brand"><div class="brand-mark">P</div><span>PigBDMR Demo</span></div>
+    <nav class="nav-links" aria-label="Demo navigation">
+      <a href="#demo">Interactive Demo</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="https://github.com/Kevinyang2/PigBDMR">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Static GitHub Pages preview</div>
+        <h1><span class="gradient-text">Text-to-video retrieval for pig behavior moments.</span></h1>
+        <p class="hero-copy">PigBDMR retrieves multiple temporal moments from long surveillance videos using natural-language behavior queries. This demo visualizes the retrieval result format, timeline interaction, and behavior-focused output used by the model.</p>
+        <div class="hero-actions">
+          <a class="button" href="#demo">Try the retrieval view</a>
+          <a class="button secondary" href="https://github.com/Kevinyang2/PigBDMR">View repository</a>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="Surveillance preview">
+        <div class="monitor-top"><div class="dots"><span></span><span></span><span></span></div><span>CAM 07 / Pig pen surveillance</span></div>
+        <div class="monitor">
+          <div class="pen-label">Behavior scene preview</div>
+          <div class="zone feeder"></div>
+          <div class="zone water"></div>
+          <div class="pig p1"></div>
+          <div class="pig p2"></div>
+          <div class="pig p3"></div>
+          <div class="overlay-card">
+            <strong>Multi-moment output</strong>
+            <p>One query can return several behavior intervals with ranking scores and temporal boundaries.</p>
+          </div>
+        </div>
+        <div class="stats-strip">
+          <div class="stat"><span>Queries</span><b>149</b></div>
+          <div class="stat"><span>Full mAP</span><b>35.22</b></div>
+          <div class="stat"><span>mIoU@1</span><b>50.08</b></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section-title" id="demo">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Interactive retrieval result</div>
+        <h2>Query, retrieve, inspect.</h2>
+      </div>
+      <p>This static demo uses representative predictions to show how PigBDMR results appear after inference. For real inference, run the Python pipeline and place generated submissions under <code>results/pigbdmr_inference</code>.</p>
+    </section>
+
+    <section class="demo-grid">
+      <aside class="panel control">
+        <h3>Retrieval controls</h3>
+        <label class="label" for="query">Natural-language behavior query</label>
+        <textarea id="query" spellcheck="false">A pig eats from the feeder.</textarea>
+        <div class="chips" id="chips" aria-label="Example queries"></div>
+
+        <label class="label" for="video">Video stream</label>
+        <select id="video">
+          <option value="multi_0007">multi_0007 / 149.8s</option>
+          <option value="multi_0013">multi_0013 / 182.4s</option>
+          <option value="multi_0021">multi_0021 / 121.6s</option>
+        </select>
+        <button class="button run" id="run" type="button">Run visualization</button>
+        <p class="hint">GitHub Pages cannot run PyTorch. The interface is designed for precomputed JSONL predictions or an external inference API.</p>
+      </aside>
+
+      <section class="panel output" aria-live="polite">
+        <div class="output-head">
+          <div>
+            <h3 id="result-title">Feeding retrieval</h3>
+            <div class="hint" id="result-subtitle">Query matched to repeated feeder-side activity.</div>
+          </div>
+          <div class="badge"><span class="pulse"></span><span id="status">3 moments found</span></div>
+        </div>
+
+        <div class="video-card">
+          <div class="preview">
+            <div class="frame-title" id="frame-title">multi_0007 / active interval preview</div>
+            <div class="zone feeder"></div>
+            <div class="zone water"></div>
+            <div class="pig p1"></div>
+            <div class="pig p2"></div>
+            <div class="pig p3"></div>
+            <div class="playhead"></div>
+          </div>
+          <div class="result-side">
+            <div class="score-card"><small>Top score</small><strong id="top-score">0.891</strong></div>
+            <div class="score-card"><small>Top interval</small><strong id="top-window">25.9s - 74.1s</strong></div>
+            <div class="score-card"><small>Behavior category</small><strong id="category">Feeding</strong></div>
+          </div>
+        </div>
+
+        <div class="timeline-wrap">
+          <div class="timeline-meta"><span>0s</span><span id="duration-label">149.8s</span></div>
+          <div class="timeline" id="timeline"></div>
+          <div class="legend"><span><i></i> Predicted moments</span><span class="gt"><i></i> Ground-truth moments when available</span></div>
+        </div>
+
+        <table class="table" aria-label="Predicted retrieval windows">
+          <thead><tr><th>Rank</th><th>Start</th><th>End</th><th>Duration</th><th>Score</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </section>
+    </section>
+
+    <section class="section-title" id="pipeline">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Model pipeline</div>
+        <h2>From query to behavior moments.</h2>
+      </div>
+      <p>The page mirrors the released inference output: each query produces ranked temporal windows with confidence scores, while the evaluator computes mAP, mIoU, and recall metrics from the same prediction format.</p>
+    </section>
+
+    <section class="architecture" aria-label="PigBDMR pipeline stages">
+      <article class="step"><b>1</b><h3>Feature extraction</h3><p>Video and text encoders produce surveillance behavior tokens and query representations.</p></article>
+      <article class="step"><b>2</b><h3>Virtual alignment</h3><p>Adaptive cross-attention aligns video tokens, language tokens, and learnable virtual tokens.</p></article>
+      <article class="step"><b>3</b><h3>Temporal prediction</h3><p>Multi-scale heads produce candidate behavior windows for single or repeated moments.</p></article>
+      <article class="step"><b>4</b><h3>Verification signal</h3><p>Training-time proposal verification improves boundary quality while keeping inference lightweight.</p></article>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <span>PigBDMR static demo for GitHub Pages.</span>
+    <span>Predictions are illustrative; run the repository inference script for real results.</span>
+  </footer>
+
+  <script>
+    const samples = [
+      {
+        query: "A pig eats from the feeder.",
+        title: "Feeding retrieval",
+        subtitle: "Query matched to repeated feeder-side activity.",
+        category: "Feeding",
+        video: "multi_0007",
+        duration: 149.8,
+        gt: [[0.0, 15.1], [25.9, 74.1]],
+        moments: [[25.9, 74.1, 0.891], [0.0, 14.0, 0.754], [82.4, 96.2, 0.412]]
+      },
+      {
+        query: "Two pigs fight or push each other.",
+        title: "Aggressive interaction retrieval",
+        subtitle: "Short and fragmented harmful-interaction candidates are highlighted.",
+        category: "Aggressive/harmful",
+        video: "multi_0013",
+        duration: 182.4,
+        gt: [[46.0, 61.5]],
+        moments: [[44.8, 62.0, 0.823], [118.5, 132.4, 0.517], [18.2, 25.6, 0.338]]
+      },
+      {
+        query: "A pig drinks water.",
+        title: "Drinking retrieval",
+        subtitle: "Water-area moments are ranked with compact temporal windows.",
+        category: "Drinking",
+        video: "multi_0021",
+        duration: 121.6,
+        gt: [[70.5, 91.3]],
+        moments: [[68.9, 92.0, 0.867], [31.4, 42.2, 0.488]]
+      },
+      {
+        query: "A pig lies on the floor.",
+        title: "Resting retrieval",
+        subtitle: "Longer low-motion intervals are localized as resting behavior.",
+        category: "Resting/lying",
+        video: "multi_0007",
+        duration: 149.8,
+        gt: [[88.0, 137.0]],
+        moments: [[84.5, 139.2, 0.802], [37.2, 53.7, 0.365]]
+      }
+    ];
+
+    const queryEl = document.querySelector("#query");
+    const videoEl = document.querySelector("#video");
+    const chipsEl = document.querySelector("#chips");
+    const runEl = document.querySelector("#run");
+    const rowsEl = document.querySelector("#rows");
+    const timelineEl = document.querySelector("#timeline");
+
+    function fmt(value) { return `${value.toFixed(1)}s`; }
+    function pct(value, duration) { return Math.max(0, Math.min(100, value / duration * 100)); }
+
+    function pickSample() {
+      const text = queryEl.value.trim().toLowerCase();
+      return samples.find(s => s.query.toLowerCase() === text)
+        || samples.find(s => text.includes(s.category.toLowerCase().split("/")[0]))
+        || samples[0];
+    }
+
+    function render(sample) {
+      videoEl.value = sample.video;
+      document.querySelector("#result-title").textContent = sample.title;
+      document.querySelector("#result-subtitle").textContent = sample.subtitle;
+      document.querySelector("#status").textContent = `${sample.moments.length} moments found`;
+      document.querySelector("#top-score").textContent = sample.moments[0][2].toFixed(3);
+      document.querySelector("#top-window").textContent = `${fmt(sample.moments[0][0])} - ${fmt(sample.moments[0][1])}`;
+      document.querySelector("#category").textContent = sample.category;
+      document.querySelector("#frame-title").textContent = `${sample.video} / active interval preview`;
+      document.querySelector("#duration-label").textContent = fmt(sample.duration);
+
+      rowsEl.innerHTML = sample.moments.map((m, i) => {
+        const dur = m[1] - m[0];
+        return `<tr><td class="rank">#${i + 1}</td><td>${fmt(m[0])}</td><td>${fmt(m[1])}</td><td>${fmt(dur)}</td><td><span class="pill">${m[2].toFixed(3)}</span></td></tr>`;
+      }).join("");
+
+      timelineEl.innerHTML = "";
+      [0.25, 0.5, 0.75].forEach(t => {
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.left = `${t * 100}%`;
+        timelineEl.appendChild(tick);
+        const label = document.createElement("div");
+        label.className = "tick-label";
+        label.style.left = `${t * 100}%`;
+        label.textContent = fmt(sample.duration * t);
+        timelineEl.appendChild(label);
+      });
+      sample.moments.forEach((m, i) => {
+        const el = document.createElement("div");
+        el.className = "moment";
+        el.title = `Rank ${i + 1}: ${fmt(m[0])} - ${fmt(m[1])}, score ${m[2].toFixed(3)}`;
+        el.style.left = `${pct(m[0], sample.duration)}%`;
+        el.style.width = `${Math.max(3, pct(m[1] - m[0], sample.duration))}%`;
+        timelineEl.appendChild(el);
+      });
+      sample.gt.forEach(g => {
+        const el = document.createElement("div");
+        el.className = "moment gt";
+        el.title = `Ground truth: ${fmt(g[0])} - ${fmt(g[1])}`;
+        el.style.left = `${pct(g[0], sample.duration)}%`;
+        el.style.width = `${Math.max(3, pct(g[1] - g[0], sample.duration))}%`;
+        timelineEl.appendChild(el);
+      });
+
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.classList.toggle("active", chip.dataset.query === sample.query);
+      });
+    }
+
+    samples.forEach(sample => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.type = "button";
+      chip.dataset.query = sample.query;
+      chip.textContent = sample.category;
+      chip.addEventListener("click", () => {
+        queryEl.value = sample.query;
+        render(sample);
+      });
+      chipsEl.appendChild(chip);
+    });
+
+    runEl.addEventListener("click", () => render(pickSample()));
+    videoEl.addEventListener("change", () => {
+      const current = pickSample();
+      const matched = samples.find(s => s.video === videoEl.value) || current;
+      queryEl.value = matched.query;
+      render(matched);
+    });
+    render(samples[0]);
+  </script>
+</body>
+</html>

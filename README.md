@@ -3,6 +3,8 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-green.svg)](requirements.txt)
 
+[Project Demo](docs/)
+
 **:star: If PigBDMR is helpful to your project, please consider starring this repository. Thanks!**
 
 ## TABLE OF CONTENTS
@@ -10,6 +12,7 @@
 - [PigBDMR: Text-to-Video Multi-Moment Retrieval via Adaptive Virtual Token Alignment for Pig Behavior Analysis in Surveillance Videos](#pigbdmr-text-to-video-multi-moment-retrieval-via-adaptive-virtual-token-alignment-for-pig-behavior-analysis-in-surveillance-videos)
   - [TABLE OF CONTENTS](#table-of-contents)
   - [1. Introduction](#1-introduction)
+  - [Demo](#demo)
   - [2. Preparation](#2-preparation)
     - [2.1 Requirements](#21-requirements)
     - [2.2 Data, Features, and Checkpoints](#22-data-features-and-checkpoints)
@@ -46,6 +49,12 @@ The framework follows the paper structure and consists of four main stages:
 4. **Post-Verification Module**: training-only temporal IoU guidance and representation refinement improve proposal quality without adding the main inference-time reranking cost by default.
 
 This public release includes source code, evaluation utilities, configuration files, and public test annotations. Training annotations, extracted features, model checkpoints, generated reports, and logs are not stored in Git.
+
+## Demo
+
+An interactive static demo is provided under `docs/` for GitHub Pages. It visualizes example query selection, ranked temporal windows, timeline overlays, and the expected JSONL-style inference output.
+
+To publish it, enable GitHub Pages with `Settings -> Pages -> Deploy from branch -> main -> /docs`.
 
 ## 2. Preparation
 

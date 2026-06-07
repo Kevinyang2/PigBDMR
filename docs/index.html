@@ -12,11 +12,6 @@
       --line: #777;
       --gt: #a8dca8;
       --ours: #eadbb0;
-      --moment: #a7d7e4;
-      --eatr: #e7c3df;
-      --tr: #abc2ee;
-      --cg: #efd8c1;
-      --flash: #c1d5e6;
       font-family: "Trebuchet MS", "Comic Sans MS", "Segoe UI", sans-serif;
     }
 
@@ -39,7 +34,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     }
 
@@ -70,7 +65,7 @@
       display: grid;
       grid-template-columns: 78px 1fr;
       gap: 18px;
-      margin-top: 46px;
+      margin-top: 54px;
     }
 
     .tag {
@@ -129,7 +124,7 @@
 
     .tracks {
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
 
     .track {
@@ -167,12 +162,6 @@
 
     .gt { background: var(--gt); }
     .ours { background: var(--ours); }
-    .moment { background: var(--moment); }
-    .eatr { background: var(--eatr); }
-    .tr { background: var(--tr); }
-    .cg { background: var(--cg); }
-    .flash { background: var(--flash); }
-
     .axis {
       display: grid;
       grid-template-columns: 170px 1fr;
@@ -232,7 +221,7 @@
     <header>
       <div>
         <h1>PigBDMR Qualitative Demo</h1>
-        <p>Representative multi-moment retrieval results for three Pig-MMR2 queries. The layout mirrors the paper-style visualization: video filmstrip, ground truth, and method predictions on the same temporal axis.</p>
+        <p>Representative multi-moment retrieval results for three Pig-MMR2 queries. Each case shows the video filmstrip, ground truth, and our predicted temporal moments on the same axis.</p>
       </div>
       <nav class="links" aria-label="Project links">
         <a href="https://github.com/Kevinyang2/PigBDMR">GitHub</a>
@@ -242,7 +231,7 @@
 
     <div id="cases"></div>
 
-    <p class="note">Bars are qualitative visualizations from representative predictions. The full inference pipeline writes JSONL submissions that can be evaluated with the released standalone evaluator.</p>
+    <p class="note">Ours uses matched predictions from the released PigBDMR submission format, following the repository visualization script: candidate windows are matched to ground-truth moments by temporal IoU, then displayed as P1/P2/P3 intervals.</p>
   </main>
 
   <script>
@@ -254,13 +243,8 @@
         duration: 150,
         ticks: [0, 30, 60, 90, 120, 150],
         tracks: [
-          { name: 'Ground Truth', cls: 'gt', segments: [[0, 15, 'P1'], [30, 69, 'P2'], [89, 125, 'P3']] },
-          { name: 'Ours', cls: 'ours', segments: [[0, 14, 'P1'], [30, 72, 'P2'], [92, 129, 'P3']] },
-          { name: 'Moment-DETR', cls: 'moment', segments: [[0, 80, 'P2'], [91, 148, 'P3']] },
-          { name: 'EaTR', cls: 'eatr', segments: [[0, 27, 'P1'], [35, 62, 'P2'], [103, 132, 'P3']] },
-          { name: 'TR-DETR', cls: 'tr', segments: [[2, 63, 'P1'], [63, 93, 'P2'], [93, 119, 'P3']] },
-          { name: 'CGDETR', cls: 'cg', segments: [[0, 87, 'P2'], [87, 136, 'P3']] },
-          { name: 'FlashVTG', cls: 'flash', segments: [[0, 16, 'P1'], [30, 69, 'P2'], [88, 124, 'P3']] }
+          { name: 'Ground Truth', cls: 'gt', segments: [[0.0, 15.089, 'P1'], [25.925, 74.082, 'P2'], [84.516, 125.209, 'P3']] },
+          { name: 'Ours', cls: 'ours', segments: [[0.0, 14.0, 'P1'], [22.0, 76.0, 'P2'], [88.0, 128.0, 'P3']] }
         ]
       },
       {
@@ -270,13 +254,8 @@
         duration: 144,
         ticks: [0, 29, 57, 86, 115, 144],
         tracks: [
-          { name: 'Ground Truth', cls: 'gt', segments: [[59, 103, 'P1']] },
-          { name: 'Ours', cls: 'ours', segments: [[60, 108, 'P1']] },
-          { name: 'Moment-DETR', cls: 'moment', segments: [[64, 82, 'P1']] },
-          { name: 'EaTR', cls: 'eatr', segments: [[62, 72, 'P1']] },
-          { name: 'TR-DETR', cls: 'tr', segments: [[86, 103, 'P1']] },
-          { name: 'CGDETR', cls: 'cg', segments: [[56, 128, 'P1']] },
-          { name: 'FlashVTG', cls: 'flash', segments: [[58, 68, 'P1']] }
+          { name: 'Ground Truth', cls: 'gt', segments: [[34.919, 78.838, 'P1']] },
+          { name: 'Ours', cls: 'ours', segments: [[36.0, 86.0, 'P1']] }
         ]
       },
       {
@@ -286,13 +265,8 @@
         duration: 169,
         ticks: [0, 34, 68, 101, 135, 169],
         tracks: [
-          { name: 'Ground Truth', cls: 'gt', segments: [[74, 116, 'P1']] },
-          { name: 'Ours', cls: 'ours', segments: [[74, 116, 'P1']] },
-          { name: 'Moment-DETR', cls: 'moment', segments: [[88, 119, 'P1']] },
-          { name: 'EaTR', cls: 'eatr', segments: [[68, 110, 'P1']] },
-          { name: 'TR-DETR', cls: 'tr', segments: [[50, 116, 'P1']] },
-          { name: 'CGDETR', cls: 'cg', segments: [[72, 151, 'P1']] },
-          { name: 'FlashVTG', cls: 'flash', segments: [[74, 120, 'P1']] }
+          { name: 'Ground Truth', cls: 'gt', segments: [[74.813, 117.637, 'P1']] },
+          { name: 'Ours', cls: 'ours', segments: [[76.0, 116.0, 'P1']] }
         ]
       }
     ];

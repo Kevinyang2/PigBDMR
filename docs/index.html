@@ -145,6 +145,16 @@
     .filmstrip::before { top: 0; }
     .filmstrip::after { bottom: 0; }
     .filmstrip img { width: 100%; height: 100%; object-fit: cover; display: block; padding: 14px 0; filter: saturate(1.04) contrast(1.05) brightness(0.9); }
+    .demo-video {
+      width: 100%;
+      height: 100%;
+      min-height: 214px;
+      object-fit: cover;
+      display: block;
+      background: #020617;
+      filter: saturate(1.04) contrast(1.05) brightness(0.9);
+    }
+    .preview .demo-video { min-height: 260px; border-radius: 18px; }
     .overlay-card {
       position: absolute;
       right: 18px;
@@ -207,7 +217,8 @@
     .track { display: grid; grid-template-columns: 112px 1fr; gap: 12px; align-items: center; margin: 12px 0; }
     .track-name { color: #cbd5e1; font-weight: 900; font-size: 13px; }
     .barline { position: relative; height: 34px; border-radius: 10px; border: 1px solid rgba(226, 232, 240, 0.42); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
-    .moment { position: absolute; top: 3px; height: 28px; border-radius: 8px; border: 1px solid rgba(15, 23, 42, 0.5); display: flex; align-items: center; padding-left: 7px; color: #433300; font-size: 12px; font-weight: 900; }
+    .moment { position: absolute; top: 3px; height: 28px; border-radius: 8px; border: 1px solid rgba(15, 23, 42, 0.5); display: flex; align-items: center; padding-left: 7px; color: #433300; font-size: 12px; font-weight: 900; cursor: pointer; }
+    .moment:hover { filter: brightness(1.12); transform: translateY(-1px); }
     .moment.gt { background: var(--gt); }
     .moment.ours { background: var(--ours); }
     .ticks { position: relative; height: 34px; margin-left: 124px; color: rgba(226, 232, 240, 0.58); font-size: 11px; }
@@ -257,7 +268,9 @@
       <aside class="hero-card" aria-label="Surveillance preview">
         <div class="monitor-top"><div class="dots"><span></span><span></span><span></span></div><span>CAM / Pig pen surveillance</span></div>
         <div class="monitor">
-          <div class="filmstrip"><img id="hero-film" src="assets/filmstrip_demo1.jpg" alt="Pig pen filmstrip preview"></div>
+          <video class="demo-video" id="hero-video" autoplay muted loop playsinline aria-label="Pig pen video preview">
+            <source src="assets/demo1.mp4" type="video/mp4">
+          </video>
           <div class="overlay-card">
             <strong>Multi-moment output</strong>
             <p>Representative pig-pen footage is paired with ground-truth and PigBDMR predicted intervals on the same timeline.</p>
@@ -314,7 +327,9 @@
           <div class="video-card">
             <div class="preview">
               <div class="frame-title" id="frame-title">demo1 / active interval preview</div>
-              <div class="filmstrip compact"><img id="result-film" src="assets/filmstrip_demo1.jpg" alt="Selected pig behavior filmstrip"></div>
+              <video class="demo-video" id="result-video" muted loop playsinline controls aria-label="Selected pig behavior video">
+                <source src="assets/demo1.mp4" type="video/mp4">
+              </video>
             </div>
             <div class="result-side">
               <div class="score-card"><small>Top score</small><strong id="top-score">0.890</strong></div>
@@ -347,6 +362,7 @@
         video: "demo1",
         originalVideo: "multi_0007",
         film: "assets/filmstrip_demo1.jpg",
+        videoSrc: "assets/demo1.mp4",
         duration: 149.769,
         ticks: [0, 30, 60, 90, 120, 150],
         gt: [[0.0, 15.089, "P1"], [25.925, 74.082, "P2"], [84.516, 125.209, "P3"]],
@@ -361,6 +377,7 @@
         video: "demo2",
         originalVideo: "multi_0013",
         film: "assets/filmstrip_demo2.jpg",
+        videoSrc: "assets/demo2.mp4",
         duration: 143.523,
         ticks: [0, 29, 57, 86, 115, 144],
         gt: [[34.919, 78.838, "P1"]],
@@ -375,6 +392,7 @@
         video: "demo3",
         originalVideo: "single_0141",
         film: "assets/filmstrip_demo3.jpg",
+        videoSrc: "assets/demo3.mp4",
         duration: 168.879,
         ticks: [0, 34, 68, 101, 135, 169],
         gt: [[74.813, 117.637, "P1"]],
@@ -392,19 +410,33 @@
     const tracksEl = document.querySelector("#tracks");
     const ticksEl = document.querySelector("#ticks");
     const segmentsEl = document.querySelector("#segments");
-    const heroFilm = document.querySelector("#hero-film");
-    const resultFilm = document.querySelector("#result-film");
+    const heroVideo = document.querySelector("#hero-video");
+    const resultVideo = document.querySelector("#result-video");
     let selectedSample = samples[0];
 
     function fmt(value) { return `${value.toFixed(1)}s`; }
     function pct(value, duration) { return Math.max(0, Math.min(100, value / duration * 100)); }
 
+    function loadVideo(videoEl, sample, autoplay) {
+      if (!videoEl || videoEl.dataset.source === sample.videoSrc) return;
+      videoEl.dataset.source = sample.videoSrc;
+      videoEl.src = sample.videoSrc;
+      videoEl.load();
+      if (autoplay) videoEl.play().catch(() => {});
+    }
+
+    function seekTo(start) {
+      if (!resultVideo) return;
+      resultVideo.currentTime = Math.max(0, start);
+      resultVideo.play().catch(() => {});
+    }
+
     function setSelected(sample) {
       selectedSample = sample;
       queryEl.value = sample.query;
       videoEl.value = sample.video;
-      heroFilm.src = sample.film;
-      resultFilm.src = sample.film;
+      loadVideo(heroVideo, sample, true);
+      loadVideo(resultVideo, sample, false);
       document.querySelector("#result-title").textContent = "Ready for PigBDMR inference";
       document.querySelector("#result-subtitle").textContent = "Click Start Inference to run the one-second demo pipeline.";
       document.querySelector("#status").textContent = "Ready for inference";
@@ -417,14 +449,15 @@
     function renderTrack(name, windows, cls, duration) {
       const moments = windows.map(w => {
         const score = w.length > 3 ? `, score ${w[3].toFixed(3)}` : "";
-        return `<div class="moment ${cls}" title="${w[2]}: ${fmt(w[0])} - ${fmt(w[1])}${score}" style="left:${pct(w[0], duration)}%;width:${Math.max(2.5, pct(w[1] - w[0], duration))}%">${w[2]}</div>`;
+        const seek = cls === "ours" ? `data-start="${w[0]}"` : "";
+        return `<div class="moment ${cls}" ${seek} title="${w[2]}: ${fmt(w[0])} - ${fmt(w[1])}${score}" style="left:${pct(w[0], duration)}%;width:${Math.max(2.5, pct(w[1] - w[0], duration))}%">${w[2]}</div>`;
       }).join("");
       return `<div class="track"><div class="track-name">${name}</div><div class="barline">${moments}</div></div>`;
     }
 
     function render(sample) {
-      heroFilm.src = sample.film;
-      resultFilm.src = sample.film;
+      loadVideo(heroVideo, sample, true);
+      loadVideo(resultVideo, sample, false);
       document.querySelector("#result-title").textContent = sample.title;
       document.querySelector("#result-subtitle").textContent = sample.subtitle;
       document.querySelector("#status").textContent = `${sample.ours.length} Ours moment${sample.ours.length > 1 ? "s" : ""} found`;
@@ -435,16 +468,23 @@
       document.querySelector("#duration-label").textContent = fmt(sample.duration);
 
       segmentsEl.innerHTML = sample.ours.map((w, i) => `
-        <article class="segment-card">
+        <article class="segment-card" data-start="${w[0]}">
           <small>Ours segment ${i + 1}</small>
           <strong>${fmt(w[0])} - ${fmt(w[1])}</strong>
           <span>${w[2]} · score ${w[3].toFixed(3)}</span>
         </article>
       `).join("");
+      segmentsEl.querySelectorAll(".segment-card").forEach(card => {
+        card.addEventListener("click", () => seekTo(Number(card.dataset.start)));
+      });
 
       tracksEl.innerHTML = renderTrack("Ground Truth", sample.gt, "gt", sample.duration) + renderTrack("Ours", sample.ours, "ours", sample.duration);
+      tracksEl.querySelectorAll(".moment.ours").forEach(moment => {
+        moment.addEventListener("click", () => seekTo(Number(moment.dataset.start)));
+      });
       ticksEl.innerHTML = sample.ticks.map(t => `<div class="tick" style="left:${pct(t, sample.duration)}%">${Math.round(t)}s</div>`).join("");
       resultsBody.hidden = false;
+      seekTo(sample.ours[0][0]);
     }
 
     function runInference() {

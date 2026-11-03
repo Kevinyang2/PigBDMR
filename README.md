@@ -195,7 +195,6 @@ The following values summarize the expected PigBDMR performance on the released 
 |---|---|---|---|---|---|---|---|---|---|
 | PigBDMR | 35.6±0.5 | 41.2±2.6 | 28.5±0.7 | 17.9±1.6 | 50.8±2.5 | 42.3±2.3 | 5.5±0.9 | 29.1±0.6 | 52.0±1.3 |
 
-PigBDMR can also be evaluated by behavior category, including aggressive/harmful behavior, feeding, drinking, resting/lying, locomotion/standing, excretion, and exploratory/social behavior. Generated reports and experiment-specific analysis artifacts are not tracked by Git.
 
 ## 5. References
 
